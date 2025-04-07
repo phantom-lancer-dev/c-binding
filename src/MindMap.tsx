@@ -825,7 +825,7 @@ const MindMap = () => {
   };
 
   // Colors for nodes (consistent)
-  const colors: Record<string, string> = { /* ... keep existing colors ... */
+  const colors: Record<string, string> = {
     "IWebDriver": "#4A90E2", "IWebElement": "#50C878", "INavigation": "#9B59B6", "ITargetLocator": "#F39C12",
     "IAlert": "#F5A623", "IOptions": "#E74C3C", "ICookieJar": "#E67E22", "Actions API": "#34495E",
     "ITimeouts": "#16A085", "IWindow": "#2980B9", "IJavaScriptExecutor": "#8E44AD", "ITakesScreenshot": "#1ABC9C",
@@ -842,8 +842,9 @@ const MindMap = () => {
     setExpandedMethods(prev => ({ ...prev, [methodKey]: !prev[methodKey] }));
   };
 
-  // Render a node and its children
-  const renderNode = (id: string, level = 0) => {
+ // *** UPDATED renderNode function START ***
+ // Render a node and its children
+ const renderNode = (id: string, level = 0) => {
     const node = nodes[id];
     if (!node) return null;
 
@@ -863,18 +864,27 @@ const MindMap = () => {
           style={{ backgroundColor, color: "white" }}
           onClick={() => toggleNode(id)}
         >
-          <span className="mr-2 font-bold text-lg" style={{ minWidth: '15px', display: 'inline-block', textAlign: 'center' }}>
+          {/* Icon */}
+          <span className="mr-2 font-bold text-lg flex-shrink-0" style={{ minWidth: '15px', display: 'inline-block', textAlign: 'center' }}>
             {nodeHasExpandableContent ? (isNodeExpanded ? "−" : "+") : ""}
           </span>
-          <span className="font-bold">{id}</span>
-          {node.description && (
-            <span className="ml-2 text-sm opacity-90 italic hidden md:inline"> - {node.description}</span>
-          )}
-           {node.accessedVia && (
-            <span className="ml-auto mr-2 text-xs px-1 py-0.5 bg-black bg-opacity-20 rounded font-semibold whitespace-nowrap">Accessed via: {node.accessedVia}</span>
-          )}
+
+          {/* Middle section (Name + Description) */}
+          {/* Takes up available space, allows shrinking, adds margin before AccessedVia */}
+          <div className="flex-grow min-w-0 mr-2">
+            {/* Name */}
+            <span className="font-bold">{id}</span>
+            {/* Description */}
+            {node.description && (
+               /* Display as block to wrap below name if needed, adjust styling */
+              <span className="block text-sm opacity-90"> - {node.description}</span>
+            )}
+          </div>
+
+          
         </div>
 
+        {/* --- REST OF THE renderNode function remains the same --- */}
         {isNodeExpanded && (
           <div className="ml-4 mt-1 mb-2 pl-3 border-l-2" style={{ borderColor: backgroundColor }}>
             {/* Node Simple Explanation & Mental Model */}
@@ -898,7 +908,6 @@ const MindMap = () => {
                 {node.methods?.map((method, index) => {
                     const methodKey = `${id}-${method.name}`;
                     const isMethodExpanded = expandedMethods[methodKey];
-                    // Method is expandable if it has *any* details beyond name/description
                     const hasDetails = !!(method.simpleExplanation || method.mentalModel || method.details || method.usage || method.pitfalls || method.params || method.example);
 
                     return (
@@ -908,15 +917,13 @@ const MindMap = () => {
                                 onClick={hasDetails ? () => toggleMethod(methodKey) : undefined}
                             >
                                 <span className="mr-2 font-medium" style={{ minWidth: '12px', display: 'inline-block', textAlign: 'center' }}>
-                                   {hasDetails ? (isMethodExpanded ? "▾" : "▸") : <span className="text-gray-400">▪</span>} {/* Indicate if expandable */}
+                                   {hasDetails ? (isMethodExpanded ? "▾" : "▸") : <span className="text-gray-400">▪</span>}
                                 </span>
                                 <span className="font-mono text-blue-700">{method.name}</span>
                                 <span className="ml-2 text-gray-600 text-xs italic hidden sm:inline">- {method.description}</span>
                             </div>
-                            {/* Conditionally render details */}
                             {hasDetails && isMethodExpanded && (
                                 <div className="text-xs bg-gray-50 p-3 pl-4 mt-0.5 mb-1 rounded border border-gray-200 ml-4 whitespace-pre-wrap shadow-sm">
-                                    {/* Method Simple Explanation & Mental Model First */}
                                     {method.simpleExplanation && (
                                         <div className="mb-2 pb-1 border-b border-gray-200">
                                             <strong className="font-semibold text-blue-700">💡 Simple Explanation:</strong>
@@ -929,7 +936,6 @@ const MindMap = () => {
                                             <p className="mt-0.5 text-gray-700 italic">{method.mentalModel}</p>
                                         </div>
                                     )}
-                                    {/* Other Details */}
                                     {method.params && <p className="mb-1.5"><strong className="font-semibold text-gray-800">Parameters:</strong> <code className="text-purple-700 bg-gray-200 px-1 rounded text-[11px]">{method.params}</code></p>}
                                     {method.usage && <p className="mb-1.5"><strong className="font-semibold text-gray-800">Usage:</strong> {method.usage}</p>}
                                     {method.details && <p className="mb-1.5"><strong className="font-semibold text-gray-800">Details:</strong> {method.details}</p>}
@@ -954,13 +960,14 @@ const MindMap = () => {
         )}
       </div>
     );
-  };
+ };
+ // *** UPDATED renderNode function END ***
+
 
     // Render the relationships view (no changes needed here)
     const renderRelationships = () => {
         return (
           <div className="mt-6 bg-gray-100 p-4 rounded shadow-sm">
-            {/* ... keep existing relationships list ... */}
              <h3 className="text-lg font-bold mb-3 text-gray-800">Key Access Relationships</h3>
             <ul className="list-disc ml-5 text-sm text-gray-700 space-y-1">
               <li><code className="font-mono bg-gray-200 px-1 rounded">driver.Navigate()</code> returns <span className="font-semibold">INavigation</span></li>
