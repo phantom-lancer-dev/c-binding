@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-
+import React, { useState } from "react";
 // Define the structure for method details
 interface MethodDetail {
   name: string;
@@ -11,7 +10,7 @@ interface MethodDetail {
   details?: string; // General details, overloads, return values etc.
 }
 
-// Define the structure for nodes
+// Define the structure for nodescd
 interface NodeData {
   description: string;
   children?: string[];
